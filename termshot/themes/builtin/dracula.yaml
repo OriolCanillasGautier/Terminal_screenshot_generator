@@ -1,0 +1,35 @@
+name: "Dracula"
+background: "#282A36"
+cursor_color: "#F8F8F2"
+colors:
+  prompt_user: "#50FA7B"
+  prompt_host: "#50FA7B"
+  prompt_path: "#8BE9FD"
+  separator: "#6272A4"
+  command: "#F8F8F2"
+  output: "#F8F8F2"
+  error: "#FF5555"
+  warning: "#FFB86C"
+  success: "#50FA7B"
+  info: "#BD93F9"
+  dim: "#6272A4"
+font:
+  family: "DejaVu Sans Mono"
+  size: 13
+  line_height: 18
+prompt:
+  type: bash
+  pattern: '^[a-zA-Z_][\w.-]*@[\w.-]+:[^$#]*[$#]\s*'
+  format: "{user}@{host}:{path}$ "
+  user: "user"
+  host: "host"
+  path: "~"
+window:
+  chrome: none
+  title: "Terminal"
+  titlebar_bg: "#191A21"
+  titlebar_fg: "#F8F8F2"
+  border_color: "#191A21"
+  border_width: 0
+padding: {top: 6, bottom: 6, left: 10, right: 10}
+width_max: 720

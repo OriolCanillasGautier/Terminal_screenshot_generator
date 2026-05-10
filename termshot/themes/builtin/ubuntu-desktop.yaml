@@ -1,0 +1,35 @@
+name: "Ubuntu Desktop"
+background: "#300A24"
+cursor_color: "#FFFFFF"
+colors:
+  prompt_user: "#4E9A06"
+  prompt_host: "#729FCF"
+  prompt_path: "#729FCF"
+  separator: "#BABABA"
+  command: "#EEEEEE"
+  output: "#D3D7CF"
+  error: "#CC0000"
+  warning: "#C4A000"
+  success: "#73D216"
+  info: "#3465A4"
+  dim: "#888888"
+font:
+  family: "DejaVu Sans Mono"
+  size: 13
+  line_height: 18
+prompt:
+  type: bash
+  pattern: '^[a-zA-Z_][\w.-]*@[\w.-]+:[^$#]*[$#]\s*'
+  format: "{user}@{host}:{path}$ "
+  user: "oriol"
+  host: "MV1"
+  path: "~"
+window:
+  chrome: none
+  title: "oriol@MV1: ~"
+  titlebar_bg: "#3C3C3C"
+  titlebar_fg: "#EEEEEE"
+  border_color: "#1A1A1A"
+  border_width: 0
+padding: {top: 6, bottom: 6, left: 10, right: 10}
+width_max: 720

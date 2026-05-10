@@ -1,0 +1,35 @@
+name: "Solarized Dark"
+background: "#002B36"
+cursor_color: "#839496"
+colors:
+  prompt_user: "#859900"
+  prompt_host: "#859900"
+  prompt_path: "#268BD2"
+  separator: "#586E75"
+  command: "#839496"
+  output: "#93A1A1"
+  error: "#DC322F"
+  warning: "#B58900"
+  success: "#859900"
+  info: "#268BD2"
+  dim: "#586E75"
+font:
+  family: "DejaVu Sans Mono"
+  size: 13
+  line_height: 18
+prompt:
+  type: bash
+  pattern: '^[a-zA-Z_][\w.-]*@[\w.-]+:[^$#]*[$#]\s*'
+  format: "{user}@{host}:{path}$ "
+  user: "user"
+  host: "host"
+  path: "~"
+window:
+  chrome: none
+  title: "Terminal"
+  titlebar_bg: "#073642"
+  titlebar_fg: "#93A1A1"
+  border_color: "#073642"
+  border_width: 0
+padding: {top: 6, bottom: 6, left: 10, right: 10}
+width_max: 720

@@ -1,0 +1,35 @@
+name: "Gruvbox"
+background: "#282828"
+cursor_color: "#EBDBB2"
+colors:
+  prompt_user: "#B8BB26"
+  prompt_host: "#B8BB26"
+  prompt_path: "#458588"
+  separator: "#928374"
+  command: "#EBDBB2"
+  output: "#D5C4A1"
+  error: "#FB4934"
+  warning: "#FABD2F"
+  success: "#B8BB26"
+  info: "#83A598"
+  dim: "#928374"
+font:
+  family: "DejaVu Sans Mono"
+  size: 13
+  line_height: 18
+prompt:
+  type: bash
+  pattern: '^[a-zA-Z_][\w.-]*@[\w.-]+:[^$#]*[$#]\s*'
+  format: "{user}@{host}:{path}$ "
+  user: "user"
+  host: "host"
+  path: "~"
+window:
+  chrome: none
+  title: "Terminal"
+  titlebar_bg: "#1D2021"
+  titlebar_fg: "#EBDBB2"
+  border_color: "#1D2021"
+  border_width: 0
+padding: {top: 6, bottom: 6, left: 10, right: 10}
+width_max: 720

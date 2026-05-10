@@ -1,0 +1,21 @@
+oriol@ubuntu:~$ sudo tcpdump -i enp0s8 -n port 80
+
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on enp0s8, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+11:50:01.123456 IP 192.168.100.10.52134 > 192.168.100.1.80: Flags [S], seq 123456789
+11:50:01.123567 IP 192.168.100.1.80 > 192.168.100.10.52134: Flags [S.], seq 987654321, ack 123456790
+11:50:01.124000 IP 192.168.100.10.52134 > 192.168.100.1.80: Flags [.], ack 1
+11:50:01.125000 IP 192.168.100.10.52134 > 192.168.100.1.80: Flags [P.], seq 1:82: HTTP: GET / HTTP/1.1
+11:50:01.125200 IP 192.168.100.1.80 > 192.168.100.10.52134: Flags [.], ack 82
+11:50:01.126000 IP 192.168.100.1.80 > 192.168.100.10.52134: Flags [P.], seq 1:521: HTTP: HTTP/1.1 200 OK
+
+oriol@ubuntu:~$ curl -s http://192.168.100.10:3000/api/status | python3 -m json.tool
+{
+    "server": "exercici5-api",
+    "status": "running",
+    "uptime": 86400,
+    "version": "1.2.0",
+    "connections": 4,
+    "memory_mb": 32.5
+}

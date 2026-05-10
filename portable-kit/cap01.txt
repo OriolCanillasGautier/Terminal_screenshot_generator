@@ -1,0 +1,23 @@
+oriol@ubuntu:~$ ip -br addr show
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+enp0s3           UP             10.0.2.15/24 metric 100 fd17:625c:f037:2:a00:27ff:fe26:9f76/64 fe80::a00:27ff:fe26:9f76/64 
+enp0s8           UP             192.168.100.1/24 fe80::a00:27ff:fe9f:a447/64 
+
+oriol@ubuntu:~$ sudo cat /etc/netplan/01-netplan.yaml
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      dhcp4: yes
+    enp0s8:
+      addresses:
+        - 192.168.100.1/24
+      nameservers:
+        addresses:
+          - 127.0.0.1
+
+oriol@ubuntu:~$ dig @127.0.0.1 exercici3.oriol.canillas.local +short
+192.168.100.1
+
+oriol@ubuntu:~$ dig @127.0.0.1 exercici4.oriol.canillas.local +short
+192.168.100.1

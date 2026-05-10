@@ -1,0 +1,29 @@
+oriol@ubuntu:~$ sudo cat /etc/apache2/sites-available/exercici4.conf
+<VirtualHost *:8080>
+    ServerName exercici4.oriol.canillas.local
+    DocumentRoot /var/www/exercici4
+
+    <Directory /var/www/exercici4/restringit>
+        AuthType Basic
+        AuthName "Zona Restringida"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/exercici4_error.log
+    CustomLog ${APACHE_LOG_DIR}/exercici4_access.log combined
+</VirtualHost>
+
+oriol@ubuntu:~$ sudo htpasswd -c /etc/apache2/.htpasswd admin
+New password: ****
+Re-type new password: ****
+Adding password for user admin
+
+oriol@ubuntu:~$ sudo systemctl reload apache2
+
+oriol@ubuntu:~$ curl -I http://exercici4.oriol.canillas.local:8080/restringit/
+HTTP/1.1 401 Unauthorized
+Date: Mon, 06 Jan 2025 10:25:15 GMT
+Server: Apache/2.4.52 (Ubuntu)
+WWW-Authenticate: Basic realm="Zona Restringida"
+Content-Type: text/html; charset=iso-8859-1

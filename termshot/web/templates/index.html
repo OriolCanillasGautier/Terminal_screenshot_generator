@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Term-Shot</title>
+<style>
+:root{--bg:#1a1a2e;--s:#16213e;--s2:#0f3460;--a:#e94560;--t:#eaeaea;--td:#a0a0b0;--b:#2a2a4a;--g:#4ecca3;--r:8px;--m:'Cascadia Code','Fira Code','DejaVu Sans Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font:14px 'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+header{background:var(--s);border-bottom:1px solid var(--b);padding:8px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+header h1{font-size:1rem;font-weight:700;color:var(--a)}
+header nav{display:flex;gap:4px;margin-left:auto}
+header nav button{background:transparent;border:1px solid var(--b);color:var(--td);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.78rem;display:flex;align-items:center;gap:6px}
+header nav button:hover{border-color:var(--a);color:var(--t)}
+header nav button.active{background:var(--a);border-color:var(--a);color:#fff}
+
+main{max-width:1340px;margin:0 auto;padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+
+.panel{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
+.panel h2{font-size:.74rem;color:var(--td);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.tab-content{display:none;flex-direction:column;gap:6px;flex:1}
+.tab-content.active{display:flex}
+
+.editor-wrap{display:flex;border:1px solid var(--b);border-radius:6px;overflow:hidden;background:#0d1117;min-height:150px}
+.editor-wrap:focus-within{border-color:var(--a)}
+.ln{width:38px;background:#0a0f16;color:#4a5568;font:13px/1.5 var(--m);padding:8px 0;text-align:right;user-select:none;overflow:hidden;flex-shrink:0}
+.ln span{display:block;padding-right:7px}
+.ed{flex:1;border:none;outline:none;resize:none;background:#0d1117;color:#c9d1d9;font:13px/1.5 var(--m);padding:8px 10px;tab-size:4;white-space:pre;overflow:auto}
+.ed::placeholder{color:#484f58}
+
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:4px}
+.tc{padding:6px 3px;border-radius:6px;border:2px solid transparent;cursor:pointer;text-align:center;font-size:.65rem;color:#ccc;min-height:38px;display:flex;align-items:center;justify-content:center;word-break:break-word;line-height:1.2}
+.tc:hover{border-color:var(--td)}
+.tc.sel{border-color:var(--a);box-shadow:0 0 8px rgba(233,69,96,0.25)}
+
+.row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.row select,.row input{background:var(--s2);color:var(--t);border:1px solid var(--b);border-radius:5px;padding:4px 6px;font-size:.78rem;outline:none}
+.row select:focus,.row input:focus{border-color:var(--a)}
+.row label{font-size:.7rem;color:var(--td)}
+input[type=range]{accent-color:var(--a)}
+input[type=checkbox]{accent-color:var(--a)}
+
+.btn{background:var(--a);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600}
+.btn:hover{filter:brightness(1.15)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn2{background:var(--s2);border:1px solid var(--b)}
+.btns{padding:3px 7px;font-size:.7rem}
+
+.upload-zone{border:1px dashed var(--b);border-radius:6px;padding:12px;text-align:center;cursor:pointer}
+.upload-zone:hover{border-color:var(--a)}
+.upload-zone input{display:none}
+
+.pv{position:relative;min-height:200px;border:1px dashed var(--b);border-radius:6px;background:#0d1117;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:1}
+.pv img{max-width:100%;max-height:100%}
+.ph{color:var(--td);font-size:.78rem}
+
+.sm{font-size:.72rem;margin-top:4px;min-height:16px;text-align:center}
+.sm.ok{color:var(--g)}.sm.err{color:var(--a)}
+
+footer{text-align:center;padding:8px;color:var(--td);font-size:.65rem}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:16px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;gap:10px}
+.modal-box h3{font-size:.85rem;color:var(--t);margin-bottom:4px}
+.modal-canvas-wrap{position:relative;overflow:hidden;border-radius:6px;background:#000}
+.modal-canvas-wrap canvas{display:block;cursor:crosshair}
+.modal-buttons{display:flex;gap:8px;justify-content:flex-end}
+
+/* Tour */
+.tour-tip{position:absolute;background:var(--a);color:#fff;padding:12px 16px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);z-index:1000;max-width:260px;font-size:.85rem;line-height:1.4;opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.3s;transform:translateY(10px)}
+.tour-tip.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+.tour-tip::after{content:'';position:absolute;border:8px solid transparent}
+.tour-tip.bottom::after{top:-16px;left:20px;border-bottom-color:var(--a)}
+.tour-tip.top::after{bottom:-16px;left:20px;border-top-color:var(--a)}
+.tour-btn{background:rgba(255,255,255,0.25);border:none;color:#fff;padding:5px 12px;border-radius:4px;margin-top:10px;cursor:pointer;float:right;font-size:.75rem;font-weight:bold}
+.tour-btn:hover{background:rgba(255,255,255,0.4)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#x25A0; term-shot</h1>
+  <nav>
+    <button id="tab-sc" class="active" onclick="swTab('sc')">Screenshot</button>
+    <button id="tab-pdf" onclick="swTab('pdf')">PDF</button>
+    <button id="tab-batch" onclick="swTab('batch')">Batch Script</button>
+    <button id="copyAiBtn" onclick="copyAiPrompt(this)" style="margin-left:10px;border-color:var(--a);color:var(--a)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      Copy AI Prompt
+    </button>
+    <button onclick="startTour()" style="margin-left:4px;border-color:var(--b);color:var(--td)" title="Show Tutorial">?</button>
+  </nav>
+</header>
+
+<div id="aiPromptText" style="display:none">I am creating terminal screenshots and a PDF report using a tool called term-shot.
+I have a project to complete (described below). I need you to provide a SINGLE Python script (.py) that batch-generates all screenshots and the final Markdown document.
+
+The Python script MUST strictly follow this format, defining ONLY these three variables: `theme`, `files`, and `md_content`. DO NOT include any execution logic, imports, or file saving code.
+
+```python
+theme = "powershell" # or "ubuntu-desktop", "macos", "windows"
+
+files = {
+    "ex1_apache.png": """pol@ubuntuserver:~$ sudo apt update
+Reading package lists... Done""",
+    "ex2_nano.png": """  GNU nano 8.4                      /etc/apache2/apache2.conf
+Content goes here
+
+^G Help          ^O Write Out     ^F Where Is      ^K Cut           
+^X Exit          ^R Read File     ^\ Replace       ^U Paste         """
+}
+
+md_content = """# Project Report
+
+Here is the apache installation:
+![Apache](ex1_apache.png)
+
+Here is the config:
+![Config](ex2_nano.png)
+"""
+```
+
+Rules:
+1. Provide realistic outputs for commands, including empty lines.
+2. For nano editors, provide the exact nano interface with the title bar and bottom keys. If you need it to look full screen, add 10-15 empty lines before the bottom menu.
+3. Return ONLY the python code block. Do not write any other python code.
+
+Project description:
+[paste project instructions here]</div>
+
+<main>
+<div class="panel">
+<div id="ct-sc" class="tab-content active">
+
+<div><h2>Theme</h2><div class="theme-grid" id="tg">
+{% for t in themes %}<div class="tc{% if t.id=='ubuntu-desktop'%} sel{%endif%}" style="background:{{t.background}}" data-th="{{t.id}}" onclick="selTh('{{t.id}}',this)">{{t.name}}</div>{% endfor %}
+</div></div>
+
+<div><h2>Background (VM screenshot)</h2>
+<div class="upload-zone" onclick="document.getElementById('bgf').click()">
+  <span style="font-size:.74rem;color:var(--td)" id="bgl">Click to upload VM/browser screenshot</span>
+  <input type="file" id="bgf" accept="image/*" onchange="upBg(this)">
+</div>
+<div id="bgInfo" style="display:none;margin-top:4px;font-size:.68rem;color:var(--td)">
+  Region: <span id="bgCoords"></span>
+  <button class="btn btns btn2" onclick="clrBg()">Remove</button>
+  <button class="btn btns" onclick="showPicker()">Edit region</button>
+</div></div>
+
+<div><h2>Options</h2><div class="row">
+  <label><input type="checkbox" id="chTg" onchange="tgCh()"> Chrome</label>
+  <select id="chSel" style="display:none" onchange="dGen()"><option value="macos">macOS</option><option value="ubuntu">Ubuntu</option><option value="windows">Windows</option></select>
+  <input type="text" id="chTitle" placeholder="Title/Filename" style="display:none;width:120px" oninput="dGen()">
+  <label style="margin-left:6px"><input type="checkbox" id="nanoTg" onchange="tgNano()"> Nano Mode</label>
+  <label style="margin-left:6px">Zoom:</label>
+  <input type="range" id="scSl" min="0.5" max="4" step="0.1" value="1" oninput="document.getElementById('scV').textContent=this.value+'x';dGen()">
+  <span style="font-size:.7rem;color:var(--td)" id="scV">1x</span>
+</div></div>
+
+<div style="flex:1;display:flex;flex-direction:column"><h2>Capture
+  <button class="btn btns btn2" onclick="copyPrompt()" style="margin-left:8px;font-weight:400">Copy prompt</button>
+</h2>
+<div class="editor-wrap" style="flex:1">
+  <div class="ln" id="lns"><span>1</span></div>
+  <textarea class="ed" id="ced" placeholder="Paste terminal output here..."
+    oninput="upLn();dGen()" onscroll="sySc()"></textarea>
+</div></div>
+
+<div style="display:flex;gap:6px;align-items:center">
+  <button class="btn" id="genB" onclick="gen()">Generate</button>
+  <button class="btn btn2" onclick="dlPng()" id="dlB" disabled>Download PNG</button>
+  <span style="flex:1"></span><span class="sm" id="sts"></span>
+</div>
+
+</div>
+
+<div id="ct-pdf" class="tab-content" style="display:none;flex:1;flex-direction:column">
+  <h2>Markdown Editor</h2>
+  <div class="editor-wrap" style="flex:1">
+    <div class="ln" id="mln"><span>1</span></div>
+    <textarea class="ed" id="med" placeholder="# My PDF Document..." oninput="upMln()" onscroll="syMsc()"></textarea>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;margin-top:12px">
+    <button class="btn" onclick="gPdf()" id="gpb">Generate PDF</button>
+    <button class="btn btn2" onclick="dlPdf()" id="dpb" disabled>Download PDF</button>
+    <span style="flex:1"></span><span class="sm" id="psts"></span>
+  </div>
+</div>
+
+<div id="ct-batch" class="tab-content" style="display:none">
+  <div><h2>Upload AI Batch Script</h2>
+  <p style="font-size:0.8rem; color:var(--td); margin-bottom: 10px;">
+    Upload a generated .py batch script to instantly generate all images and download the full PDF report.
+  </p>
+  <div id="bz" class="upload-zone" onclick="document.getElementById('bscript').click()">
+    <span style="font-size:.74rem;color:var(--td)" id="bsl">Click to upload .py script</span>
+    <input type="file" id="bscript" accept=".py" style="display:none" onchange="upBatch(this)">
+  </div>
+  <p style="text-align:center; margin: 10px 0; color:var(--td); font-size:0.8rem;">&mdash; OR PASTE SCRIPT &mdash;</p>
+  <div class="editor-wrap" style="flex:1; min-height:200px">
+    <textarea class="ed" id="bcode" placeholder="# Paste the generated Python script here..." oninput="upBatchCode()"></textarea>
+  </div>
+  <div style="margin-top:12px; display:flex; justify-content:flex-end">
+    <button class="btn" onclick="genBatch()" id="bbtn" style="display:none">Generate Batch PDF</button>
+  </div>
+  </div>
+</div>
+</div>
+
+<div class="panel">
+<div id="pv-sc" class="tab-content active">
+  <h2>Result</h2><div class="pv" id="respv"><div class="ph" id="reph">Generate to see result</div></div>
+</div>
+<div id="pv-pdf" class="tab-content"><h2>PDF</h2><div class="pv" id="ppv" style="flex:1"><div class="ph">PDF will appear here</div></div></div>
+<div id="pv-batch" class="tab-content"><h2>Batch Results</h2><div class="pv" id="bpv" style="flex:1"><div class="ph">Batch results will appear here</div></div></div>
+</div>
+</main>
+
+<div id="tourTip" class="tour-tip">
+  <div id="tourText"></div>
+  <div style="overflow:hidden">
+    <button class="tour-btn" id="tourNext" onclick="nextTour()">Next</button>
+  </div>
+</div>
+
+<script>
+let curTh='ubuntu-desktop',lastPng=null,lastPdf=null,deb=null;
+let bgFile=null,bgNW=0,bgNH=0,selR=null;
+let curTab='sc';
+
+function swTab(t){
+  document.getElementById('tab-'+curTab).classList.remove('active');
+  document.getElementById('ct-'+curTab).style.display='none';
+  document.getElementById('pv-'+curTab).classList.remove('active');
+  curTab=t;
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('ct-'+t).style.display=(t==='sc'||t==='pdf'||t==='batch')?'flex':'block';
+  document.getElementById('pv-'+t).classList.add('active');
+  if(t==='sc')auGen();
+}
+
+function selTh(id,el){
+  curTh=id;
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  auGen();
+}
+function tgCh(){
+  const o=document.getElementById('chTg').checked;
+  document.getElementById('chSel').style.display=o?'':'none';
+  // Keep title input visible if either chrome or nano is active
+  const n=document.getElementById('nanoTg').checked;
+  document.getElementById('chTitle').style.display=(o||n)?'':'none';
+  auGen();
+}
+function tgNano(){
+  const o=document.getElementById('chTg').checked;
+  const n=document.getElementById('nanoTg').checked;
+  document.getElementById('chTitle').style.display=(o||n)?'':'none';
+  auGen();
+}
+
+// ---- Copy AI Prompt ----
+function copyAiPrompt(btn) {
+  const text = document.getElementById('aiPromptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+// ---- BG upload ----
+function upBg(inp){
+  if(!inp.files.length)return;
+  bgFile=inp.files[0];
+  const img=new Image();
+  img.onload=function(){
+    bgNW=img.naturalWidth;bgNH=img.naturalHeight;
+    selR=null;
+    document.getElementById('bgCoords').textContent='';
+    document.getElementById('bgInfo').style.display='none';
+    document.getElementById('bgl').textContent='Loaded: '+bgFile.name+' ('+bgNW+'\u00d7'+bgNH+')';
+    // auto-open picker
+    showPicker();
+  };
+  img.src=URL.createObjectURL(bgFile);
+
+  // Upload to server
+  const fd=new FormData();fd.append('file',bgFile);
+  fetch('/api/upload-bg',{method:'POST',body:fd}).catch(e=>console.warn(e));
+}
+
+function showPicker(){
+  if(!bgFile)return;
+  const img=new Image();
+  img.onload=function(){
+    const w=window.innerWidth*.9, h=window.innerHeight*.7;
+    const s=Math.min(w/img.naturalWidth, h/img.naturalHeight, 1);
+    const cw=Math.floor(img.naturalWidth*s), ch=Math.floor(img.naturalHeight*s);
+
+    const mc=document.getElementById('mc');
+    mc.width=cw;mc.height=ch;
+    mc._scale=s;mc._nw=img.naturalWidth;mc._nh=img.naturalHeight;
+    const ctx=mc.getContext('2d');
+    ctx.drawImage(img,0,0,cw,ch);
+
+    let drawing=false, ds={x:0,y:0}, rect=selR?{...selR}:null;
+
+    mc.onmousedown=function(e){
+      drawing=true;
+      const r=mc.getBoundingClientRect();
+      ds={x:(e.clientX-r.left)/s, y:(e.clientY-r.top)/s};
+      rect=null;
+    };
+    mc.onmousemove=function(e){
+      if(!drawing)return;
+      const r=mc.getBoundingClientRect();
+      const mx=(e.clientX-r.left)/s, my=(e.clientY-r.top)/s;
+      rect={x:Math.min(ds.x,mx),y:Math.min(ds.y,my),w:Math.abs(mx-ds.x),h:Math.abs(my-ds.y)};
+      ctx.clearRect(0,0,cw,ch);
+      ctx.drawImage(img,0,0,cw,ch);
+      ctx.strokeStyle='#e94560';ctx.lineWidth=3;ctx.setLineDash([6,3]);
+      ctx.strokeRect(rect.x*s,rect.y*s,rect.w*s,rect.h*s);
+      ctx.setLineDash([]);ctx.lineWidth=1;
+      ctx.fillStyle='rgba(233,69,96,0.12)';
+      ctx.fillRect(rect.x*s,rect.y*s,rect.w*s,rect.h*s);
+      document.getElementById('pickerInfo').textContent=Math.round(rect.w)+'\u00d7'+Math.round(rect.h);
+    };
+    mc.onmouseup=function(){drawing=false;if(rect&&rect.w>5)selR=rect;};
+
+    document.getElementById('pickerModal').classList.add('show');
+    document.getElementById('pickerConfirm').onclick=function(){closePicker(true)};
+    document.getElementById('pickerInfo').textContent=selR?Math.round(selR.w)+'\u00d7'+Math.round(selR.h):'Draw a rectangle';
+  };
+  img.src=URL.createObjectURL(bgFile);
+}
+
+function closePicker(confirm){
+  document.getElementById('pickerModal').classList.remove('show');
+  if(confirm&&selR&&selR.w>5){
+    document.getElementById('bgCoords').textContent=
+      Math.round(selR.w)+'\u00d7'+Math.round(selR.h)+
+      ' at ('+Math.round(selR.x)+','+Math.round(selR.y)+')';
+    document.getElementById('bgInfo').style.display='';
+    auGen();
+  }
+}
+
+function clrBg(){
+  selR=null;bgFile=null;
+  document.getElementById('bgCoords').textContent='';
+  document.getElementById('bgInfo').style.display='none';
+  document.getElementById('bgf').value='';
+  document.getElementById('bgl').textContent='Click to upload VM/browser screenshot';
+  auGen();
+}
+
+// ---- Editor helpers ----
+function upLn(){const n=document.getElementById('ced').value.split('\n').length;let h='';for(let i=1;i<=n;i++)h+='<span>'+i+'</span>';document.getElementById('lns').innerHTML=h}
+function sySc(){document.getElementById('lns').scrollTop=document.getElementById('ced').scrollTop}
+function upMln(){const n=document.getElementById('med').value.split('\n').length;let h='';for(let i=1;i<=n;i++)h+='<span>'+i+'</span>';document.getElementById('mln').innerHTML=h}
+function syMsc(){document.getElementById('mln').scrollTop=document.getElementById('med').scrollTop}
+function dGen(){clearTimeout(deb);deb=setTimeout(auGen,500)}
+function auGen(){const t=document.getElementById('ced').value.trim();if(t&&t.length>=3)gen()}
+
+// ---- Generate ----
+async function gen(){
+  const tx=document.getElementById('ced').value.trim();
+  if(!tx){st('err','Paste terminal output first');return}
+  const b=document.getElementById('genB');b.disabled=true;st('','Generating...');
+  const co=document.getElementById('chTg').checked;
+  const t=document.getElementById('tg').querySelector('.sel');
+  if(t)curTh=t.dataset.th;
+  let bx=0,by=0,rw=0,rh=0;
+  if(selR){bx=Math.round(selR.x);by=Math.round(selR.y);rw=Math.round(selR.w);rh=Math.round(selR.h)}
+  try{
+    const fd=new FormData();
+    fd.append('text',tx);fd.append('theme',curTh);
+    fd.append('chrome',co?document.getElementById('chSel').value:'');
+    fd.append('title',(co||document.getElementById('nanoTg').checked)?document.getElementById('chTitle').value:'');
+    fd.append('scale',document.getElementById('scSl').value);
+    fd.append('nano',document.getElementById('nanoTg').checked);
+    fd.append('bg_x',bx);fd.append('bg_y',by);
+    fd.append('rect_w',rw);fd.append('rect_h',rh);
+    const r=await fetch('/api/generate',{method:'POST',body:fd});
+    if(!r.ok){const e=await r.json();st('err',e.error||'Failed')}
+    else{
+      lastPng=await r.blob();
+      document.getElementById('respv').innerHTML='<img src="'+URL.createObjectURL(lastPng)+'" style="max-width:100%;max-height:100%">';
+      document.getElementById('dlB').disabled=false;st('ok','Done')
+    }
+  }catch(e){st('err','Error: '+e.message)}
+  b.disabled=false;
+}
+function dlPng(){if(lastPng){const a=document.createElement('a');a.href=URL.createObjectURL(lastPng);a.download='screenshot.png';a.click()}}
+
+function copyPrompt(){
+  const def = 'oriol@MV1:~$ ';
+  const inp = prompt('Enter prompt prefix (user@host:~$, PS path>, etc.):', def);
+  if (!inp) return;
+  const ta = document.getElementById('ced');
+  if (ta.value && !ta.value.endsWith('\n')) ta.value += '\n';
+  ta.value += inp + ' ';
+  ta.focus();
+  upLn();
+}
+
+// ---- PDF ----
+async function gPdf(){
+  const tx=document.getElementById('med').value.trim();
+  if(!tx){pst('err','Paste markdown first');return}
+  const b=document.getElementById('gpb');b.disabled=true;pst('','Generating...');
+  try{
+    const fd=new FormData();fd.append('markdown',tx);
+    const r=await fetch('/api/pdf',{method:'POST',body:fd});
+    if(!r.ok){const e=await r.json();pst('err',e.error||'Failed')}
+    else{
+      lastPdf=await r.blob();
+      document.getElementById('ppv').innerHTML='<p style="color:var(--g);padding:40px">PDF ready</p>';
+      document.getElementById('dpb').disabled=false;pst('ok','Done')
+    }
+  }catch(e){pst('err','Error: '+e.message)}
+  b.disabled=false;
+}
+function dlPdf(){if(lastPdf){const a=document.createElement('a');a.href=URL.createObjectURL(lastPdf);a.download='document.pdf';a.click()}}
+
+function st(c,m){const s=document.getElementById('sts');s.textContent=m;s.className='sm '+(c||'')}
+function pst(c,m){const s=document.getElementById('psts');s.textContent=m;s.className='sm '+(c||'')}
+
+upLn();upMln();
+// ---- Batch Script ----
+let batchFile=null;
+function upBatch(inp){
+  if(!inp.files.length)return;
+  batchFile=inp.files[0];
+  document.getElementById('bsl').textContent=batchFile.name;
+  document.getElementById('bbtn').style.display='block';
+  // Clear textarea to avoid confusion
+  document.getElementById('bcode').value = '';
+}
+function upBatchCode(){
+  if(document.getElementById('bcode').value.trim().length > 10 || batchFile){
+    document.getElementById('bbtn').style.display='block';
+  }else{
+    document.getElementById('bbtn').style.display='none';
+  }
+  // Clear file if they start typing
+  if(document.getElementById('bcode').value.trim().length > 0) {
+    batchFile = null;
+    document.getElementById('bscript').value = '';
+    document.getElementById('bsl').textContent = 'Click to upload .py script';
+  }
+}
+
+async function genBatch(){
+  const code = document.getElementById('bcode').value.trim();
+  if(!batchFile && !code)return;
+  const b=document.getElementById('bbtn');
+  b.textContent='Generating...';b.disabled=true;
+  const fd=new FormData();
+  if(batchFile) fd.append('file',batchFile);
+  if(code) fd.append('code', code);
+  try{
+    const r=await fetch('/api/batch-script',{method:'POST',body:fd});
+    if(r.ok){
+      const bl=await r.blob();
+      const u=URL.createObjectURL(bl);
+      const a=document.createElement('a');
+      a.href=u;a.download='batch_report.pdf';
+      a.click();
+      URL.revokeObjectURL(u);
+    }else{
+      const j=await r.json();
+      alert('Error: '+j.error);
+    }
+  }catch(e){
+    alert(e);
+  }
+  b.textContent='Generate Batch PDF';b.disabled=false;
+}
+
+// ---- Guided Tour ----
+const tourSteps = [
+  { el: 'copyAiBtn', text: '1. Clica aquí per copiar el Prompt. Envia\'l a la teva IA per generar l\'script!', pos: 'bottom' },
+  { el: 'tab-batch', text: '2. Quan tinguis l\'script .py de la IA, vés a aquesta pestanya.', pos: 'bottom' },
+  { el: 'bz', text: '3. Pots pujar el fitxer aquí, O BÉ enganxar el codi a sota.', pos: 'bottom', before: () => swTab('batch') },
+  { el: 'bbtn', text: '4. I finalment clica per generar i descarregar el teu PDF al complet!', pos: 'top', before: () => { swTab('batch'); document.getElementById('bbtn').style.display='block'; } }
+];
+let tourIdx = -1;
+
+function startTour() {
+  tourIdx = 0;
+  showTourStep();
+}
+
+function showTourStep() {
+  const tip = document.getElementById('tourTip');
+  if (tourIdx >= tourSteps.length) {
+    tip.classList.remove('show');
+    localStorage.setItem('termshot_tour_v3', '1');
+    if(!batchFile && document.getElementById('bcode').value.trim().length === 0) {
+      document.getElementById('bbtn').style.display='none';
+    }
+    swTab('sc');
+    return;
+  }
+  const step = tourSteps[tourIdx];
+  if (step.before) step.before();
+  
+  // Wait a moment for layout to update
+  setTimeout(() => {
+    const el = document.getElementById(step.el);
+    const r = el.getBoundingClientRect();
+    
+    document.getElementById('tourText').textContent = step.text;
+    document.getElementById('tourNext').textContent = (tourIdx === tourSteps.length - 1) ? 'Finalitzar' : 'Següent';
+    
+    tip.className = 'tour-tip ' + step.pos + ' show';
+    
+    // Slight adjustments so the arrow aligns nicely
+    let t_top, t_left = r.left + window.scrollX - 10;
+    
+    // We use setTimeout to allow display:block to calculate height
+    requestAnimationFrame(() => {
+      if (step.pos === 'bottom') {
+        t_top = r.bottom + 12 + window.scrollY;
+      } else {
+        t_top = r.top - tip.offsetHeight - 12 + window.scrollY;
+      }
+      tip.style.top = t_top + 'px';
+      tip.style.left = t_left + 'px';
+    });
+  }, 50);
+}
+
+function nextTour() {
+  tourIdx++;
+  showTourStep();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if(localStorage.getItem('termshot_tour_v3') !== '1') {
+    setTimeout(startTour, 600);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+oriol@ubuntu:~$ sudo cat /etc/apache2/sites-available/exercici3.conf
+<VirtualHost *:80>
+    ServerName exercici3.oriol.canillas.local
+    DocumentRoot /var/www/exercici3
+
+    <Directory /var/www/exercici3/protegida>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/exercici3>
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/exercici3_error.log
+    CustomLog ${APACHE_LOG_DIR}/exercici3_access.log combined
+</VirtualHost>
+
+oriol@ubuntu:~$ sudo systemctl reload apache2
+
+oriol@ubuntu:~$ curl -I http://exercici3.oriol.canillas.local/
+HTTP/1.1 200 OK
+Date: Mon, 06 Jan 2025 10:20:45 GMT
+Server: Apache/2.4.52 (Ubuntu)
+Last-Modified: Mon, 06 Jan 2025 10:00:12 GMT
+Content-Type: text/html
+
+oriol@ubuntu:~$ curl -I http://exercici3.oriol.canillas.local/protegida/arxiu.php
+HTTP/1.1 403 Forbidden
+Date: Mon, 06 Jan 2025 10:21:03 GMT
+Server: Apache/2.4.52 (Ubuntu)
+Content-Type: text/html; charset=iso-8859-1

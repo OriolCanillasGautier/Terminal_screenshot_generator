@@ -1,0 +1,33 @@
+name: "PowerShell"
+background: "#0C0C0C"
+cursor_color: "#FFFFFF"
+colors:
+  prompt_user: "#3B78FF"
+  prompt_host: "#3B78FF"
+  prompt_path: "#EEDD3C"
+  separator: "#CCCCCC"
+  command: "#FFFFFF"
+  output: "#CCCCCC"
+  error: "#E74856"
+  warning: "#F9F1A5"
+  success: "#16C60C"
+  info: "#3B78FF"
+  dim: "#666666"
+font:
+  family: "DejaVu Sans Mono"
+  size: 13
+  line_height: 18
+prompt:
+  type: powershell
+  pattern: '^PS\s+\S+>\s*'
+  format: "PS {path}> "
+  path: "~"
+window:
+  chrome: none
+  title: "Windows PowerShell"
+  titlebar_bg: "#323232"
+  titlebar_fg: "#CCCCCC"
+  border_color: "#1A1A1A"
+  border_width: 0
+padding: {top: 6, bottom: 6, left: 10, right: 10}
+width_max: 720

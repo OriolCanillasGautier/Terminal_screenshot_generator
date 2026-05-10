@@ -1,0 +1,23 @@
+oriol@server:~$ sudo systemctl status apache2
+● apache2.service - The Apache HTTP Server
+     Loaded: loaded (/lib/systemd/system/apache2.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2025-01-06 10:15:22 CET; 2 days ago
+       Docs: https://httpd.apache.org/docs/2.4/
+   Main PID: 892 (apache2)
+      Tasks: 55 (limit: 2314)
+     Memory: 14.2M
+        CPU: 3.457s
+     CGroup: /system.slice/apache2.service
+             ├─ 892 /usr/sbin/apache2 -k start
+             ├─ 936 /usr/sbin/apache2 -k start
+             └─ 937 /usr/sbin/apache2 -k start
+
+oriol@server:~$ sudo apache2ctl -t
+Syntax OK
+
+oriol@server:~$ sudo apache2ctl -S
+VirtualHost configuration:
+*:80                   exercici3.oriol.canillas.local (/etc/apache2/sites-enabled/exercici3.conf:1)
+*:8080                 exercici4.oriol.canillas.local (/etc/apache2/sites-enabled/exercici4.conf:1)
+ServerRoot: "/etc/apache2"
+Main DocumentRoot: "/var/www/html"

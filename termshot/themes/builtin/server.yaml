@@ -1,0 +1,35 @@
+name: "Server"
+background: "#000000"
+cursor_color: "#00FF00"
+colors:
+  prompt_user: "#00FF00"
+  prompt_host: "#00FF00"
+  prompt_path: "#00FF00"
+  separator: "#00AA00"
+  command: "#FFFFFF"
+  output: "#AAAAAA"
+  error: "#FF0000"
+  warning: "#FFFF00"
+  success: "#00FF00"
+  info: "#00AAFF"
+  dim: "#666666"
+font:
+  family: "DejaVu Sans Mono"
+  size: 14
+  line_height: 19
+prompt:
+  type: bash
+  pattern: '^[a-zA-Z_][\w.-]*@[\w.-]+:[^$#]*[$#]\s*'
+  format: "{user}@{host}:{path}$ "
+  user: "root"
+  host: "server"
+  path: "~"
+window:
+  chrome: none
+  title: "root@server: ~"
+  titlebar_bg: "#1A1A1A"
+  titlebar_fg: "#AAAAAA"
+  border_color: "#000000"
+  border_width: 0
+padding: {top: 6, bottom: 6, left: 12, right: 12}
+width_max: 720
