@@ -11,3 +11,4 @@ venv/
 *.png
 *.pdf
 !examples/*.png
+*.spec

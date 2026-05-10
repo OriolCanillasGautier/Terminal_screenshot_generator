@@ -152,7 +152,8 @@ def main():
     elif args.command == 'picker':
         cmd_picker(args)
     else:
-        parser.print_help()
+        # Default: launch web UI when double-clicked
+        cmd_web(argparse.Namespace(host='127.0.0.1', port=8765))
 
 
 if __name__ == '__main__':
